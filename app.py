@@ -3,6 +3,23 @@
 import random
 import time
 
+#사운드 출력 모듈
+# import pygame
+import sqlite3
+import datetime
+
+# pygame.mixer.init()
+# correct_sound = pygame.mixer.Sound("./sound/good.wav")
+# #correct_sound.set_volume(0.5)
+# correct_sound.play()
+
+#DB생성 & Auto Commit
+conn = sqlite3.connect('/mnt/c/Users/mch12/Documents/typingGame/resource/record.db', isolation_level=None)
+# 커서 연결
+cursor = conn.cursor()
+
+cursor.execute("CREATE TABLE IF NOT EXISTS records(id INTEGER PRIMARY KEY AUTOINCREMENT, correct_cnt INTEGER, record text, regdate text)")
+
 words = [] # 영어 단어 리스트 (1000개 로드하기)
 
 n = 1   #게임 시도 횟수
@@ -30,10 +47,13 @@ while n <= 5:
 
     print()
     if str(q).strip() == str(x).strip(): #입력한 답이 정답이라면
-        print("Pass!")        
+        print("Pass!")
+        #정답 소리 재생
+
         correct_cnt += 1
     else:
         print("Wrong!")
+        #오답 소리 재생
 
     n += 1
     
@@ -49,6 +69,10 @@ else:
     print("불합격")
 
 print()
+
+#기록 DB삽입
+cursor.execute("INSERT INTO records('correct_cnt', 'record', 'regdate') VALUES(?,?,?)", (correct_cnt, playtime, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+
 
 #수행시간 출력
 print("게임 시간 : ", playtime, "초", " 정답 개수 : {}".format(correct_cnt))
